@@ -1,0 +1,3 @@
+pip install pandas==2.3.3
+pip install vk-api==11.10.0
+pip install psycopg2-binary==2.9.11
