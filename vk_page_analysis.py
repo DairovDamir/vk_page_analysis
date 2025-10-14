@@ -1,7 +1,7 @@
 import pandas as pd
 import vk_api
 from config_file import vk_token
-import  psycopg2
+import psycopg2
 from psycopg2.extras import execute_values
 
 try:
@@ -57,3 +57,5 @@ try:
             conn.commit()
 except Exception as e:
     print('Ошибка при подключении к PostgreSQL:', e)
+
+df.to_csv('vk_posts_table.csv')
