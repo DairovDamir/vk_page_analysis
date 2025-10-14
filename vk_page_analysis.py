@@ -32,6 +32,10 @@ try:
     ) as conn:
         with conn.cursor() as cur:
             cur.execute('''
+                TRUNCATE TABLE table1;
+            ''')
+
+            cur.execute('''
             	CREATE TABLE IF NOT EXISTS table1 (
                 	id SERIAL PRIMARY KEY,
                 	date TIMESTAMP,
