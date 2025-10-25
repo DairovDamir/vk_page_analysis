@@ -8,3 +8,26 @@ services:
     restart: always
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "8123:8123"
+    environment:
+      CLICKHOUSE_DB: vk_analysis_db
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: password
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:8123/ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  clickhouse-data:
