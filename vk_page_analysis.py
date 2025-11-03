@@ -3,6 +3,7 @@ import vk_api
 from config_file import vk_token
 import psycopg2
 from psycopg2.extras import execute_values
+import clickhouse_connect
 
 try:
     vk_session = vk_api.VkApi(token=vk_token)
@@ -34,7 +35,6 @@ try:
             cur.execute('''
                 TRUNCATE TABLE table1;
             ''')
-
             cur.execute('''
             	CREATE TABLE IF NOT EXISTS table1 (
                 	id SERIAL PRIMARY KEY,
@@ -58,4 +58,25 @@ try:
 except Exception as e:
     print('Ошибка при подключении к PostgreSQL:', e)
 
-df.to_csv('vk_posts_table.csv')
+try:
+    client = clickhouse_connect.get_client(
+        host='localhost',
+        port=8123,
+        username='admin',
+        password='password',
+        database='vk_analysis_db'
+    )
+
+    client.command('''CREATE TABLE IF NOT EXISTS vk_analysis_db.table1 (
+                    id Int32,
+                    date DateTime,
+                    text String,
+                    likes Int32
+                ) ENGINE = MergeTree()
+                    ORDER BY (id);''')
+
+    client.insert_df(df=df, table='table1', database='vk_analysis_db')
+except Exception as e:
+    print('Ошибка при подключении к Clickhouse:', e)
+
+df.to_csv('vk_posts_new_table.csv')
